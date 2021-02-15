@@ -14,9 +14,12 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Properties;
 
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -196,13 +199,23 @@ public class Main extends JFrame {
 					connectLabel.setText("Не активно");
 					connectLabel.setForeground(Color.red);
 				}
-				}catch (JsonMappingException jme) {
+				}catch (JsonProcessingException jme) {
 					JOptionPane.showMessageDialog(null,"Ошибка чтения из базы данных: " + jme.getMessage());
-		        } catch (JsonProcessingException jpe) {
-					JOptionPane.showMessageDialog(null, "Ошибка чтения из базы данных: " + jpe.getMessage());
-				}
+		        }
 				
 			}
+		});
+		
+		disconnectBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+            	
+            	dataBase.disconnect();
+            	dataBase.unlockConnections();
+            	connectBtn.setEnabled(true);
+				connectLabel.setText("Не активно");
+				connectLabel.setForeground(Color.red);
+            	
+            }
 		});
 	}
 

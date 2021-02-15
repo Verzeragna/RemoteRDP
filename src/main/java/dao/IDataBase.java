@@ -15,5 +15,7 @@ public interface IDataBase {
 	Lock checkLock() throws JsonMappingException, JsonProcessingException;
 	void openKontur(String path) throws IOException;
 	void lockConnection();
-	
+	void unlockConnections();
+	void recordLog();
+	void updateLog() throws JsonMappingException, JsonProcessingException;
 }

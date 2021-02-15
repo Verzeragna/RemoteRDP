@@ -8,4 +8,6 @@ public class Lock {
 	public Lock(String user) {
 		this.user = user;
 	}
+	
+	
 }

@@ -8,6 +8,7 @@ import java.util.logging.Logger;
 import java.io.IOException;
 
 import org.bson.Document;
+import org.bson.conversions.Bson;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -18,8 +19,10 @@ import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.Filters;
 
 import lock.Lock;
+import log.Log;
 
 public class DataBase implements IDataBase {
 
@@ -40,7 +43,7 @@ public class DataBase implements IDataBase {
 
 	public void disconnect() {
 		// TODO Auto-generated method stub
-
+		mongoClient.close();
 	}
 
 	public Lock checkLock() throws JsonMappingException, JsonProcessingException {
@@ -63,7 +66,7 @@ public class DataBase implements IDataBase {
 
 	public void openKontur(String path) throws IOException {
 		// TODO Auto-generated method stub
-		Process process = new ProcessBuilder(path,"/v:10.177.112.170","/f").start();
+		Process process = new ProcessBuilder(path, "/v:10.177.112.170", "/f").start();
 	}
 
 	public void lockConnection() {
@@ -71,7 +74,7 @@ public class DataBase implements IDataBase {
 		MongoCollection<Document> col = db.getCollection("lock");
 		Document doc = new Document();
 		doc.put("user", getUserName());
-        doc.put("datestart", getCurrentDate());
+		doc.put("datestart", getCurrentDate());
 		col.insertOne(doc);
 	}
 
@@ -84,8 +87,42 @@ public class DataBase implements IDataBase {
 
 	private String getCurrentDate() {
 		Date dateNow = new Date();
-        SimpleDateFormat simpleDate = new SimpleDateFormat("dd.MMMM.yyyy");
-        String today = simpleDate.format(dateNow);
-        return today;
+		SimpleDateFormat simpleDate = new SimpleDateFormat("dd.MMMM.yyyy");
+		String today = simpleDate.format(dateNow);
+		return today;
+	}
+
+	@Override
+	public void unlockConnections() {
+		// TODO Auto-generated method stub
+		Bson filter = Filters.eq("");
+		db.getCollection("lock").deleteMany(filter);
+	}
+
+	@Override
+	public void recordLog() {
+		// TODO Auto-generated method stub
+		MongoCollection<Document> col = db.getCollection("log");
+		Document doc = new Document();
+		doc.put("user", getUserName());
+		doc.put("datestart", getCurrentDate());
+		doc.put("dateend", getCurrentDate());
+		col.insertOne(doc);
+	}
+
+	@Override
+	public void updateLog() throws JsonMappingException, JsonProcessingException {
+		// TODO Auto-generated method stub
+		Bson filter = Filters.eq("_id", -1);
+		Document document = db.getCollection("log").find().limit(1).sort(filter).first();
+		ObjectMapper mapper = new ObjectMapper();
+        assert document != null;
+        Log log = mapper.readValue(document.toJson(), Log.class);
+        Document newDoc = new Document();
+        newDoc.put("user", log.user);
+        newDoc.put("datestart", log.dateStart);
+        newDoc.put("dateend", log.dateEnd);
+        Bson filterUpdate = Filters.eq("_id", -1);
+        db.getCollection("log").updateOne(filterUpdate, new Document("$set", newDoc));
 	}
 }
