@@ -5,6 +5,7 @@ import java.util.Properties;
 
 public class Util implements IUtil{
 
+	@Override
 	public Properties getProperties(String path) throws Exception {
 		// TODO Auto-generated method stub
 		Properties properties = new Properties();

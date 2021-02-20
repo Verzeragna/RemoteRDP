@@ -24,11 +24,12 @@ import com.mongodb.client.model.Filters;
 import lock.Lock;
 import log.Log;
 
-public class DataBase implements IDataBase {
+public class DataBase implements IDataBase{
 
 	public MongoClient mongoClient;
 	public MongoDatabase db;
 
+	@Override
 	public boolean connect(Properties properties) throws Exception {
 		// TODO Auto-generated method stub
 		Logger mongoLogger = Logger.getLogger("org.mongodb.driver");
@@ -41,11 +42,13 @@ public class DataBase implements IDataBase {
 		return true;
 	}
 
+	@Override
 	public void disconnect() {
 		// TODO Auto-generated method stub
 		mongoClient.close();
 	}
-
+	
+	@Override
 	public Lock checkLock() throws JsonMappingException, JsonProcessingException {
 		// TODO Auto-generated method stub
 		ObjectMapper mapper = new ObjectMapper();
@@ -64,11 +67,14 @@ public class DataBase implements IDataBase {
 		}
 	}
 
+	@Override
 	public void openKontur(String path) throws IOException {
 		// TODO Auto-generated method stub
-		Process process = new ProcessBuilder(path, "/v:10.177.112.170", "/f").start();
+		Process process = new ProcessBuilder("mstsc.exe", "/v:10.177.112.170", "/f",
+                "/edit", path).start();
 	}
 
+	@Override
 	public void lockConnection() {
 		// TODO Auto-generated method stub
 		MongoCollection<Document> col = db.getCollection("lock");

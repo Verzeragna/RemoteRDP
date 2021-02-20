@@ -30,16 +30,18 @@ import javax.swing.border.EmptyBorder;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 
+import dao.DataBase;
 import dao.IDataBase;
 import lock.Lock;
 import util.IUtil;
+import util.Util;
 
 public class Main extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 	private static TrayIcon trayIcon;
-	private IDataBase dataBase;
-	private IUtil util;
+	private IDataBase dataBase = new DataBase();
+	private IUtil util = new Util();
 	private boolean isConnected = false;
 	private Lock lock;
 
