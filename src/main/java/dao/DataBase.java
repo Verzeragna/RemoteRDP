@@ -23,6 +23,7 @@ import com.mongodb.client.model.Filters;
 
 import lock.Lock;
 import log.Log;
+import util.ReleeseResources;
 
 public class DataBase implements IDataBase{
 
@@ -39,6 +40,7 @@ public class DataBase implements IDataBase{
 				+ properties.getProperty("dbname");
 		mongoClient = MongoClients.create(strURL);
 		db = mongoClient.getDatabase(properties.getProperty("dbname"));
+		ReleeseResources.mongoClient = mongoClient;
 		return true;
 	}
 

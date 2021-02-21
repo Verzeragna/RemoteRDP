@@ -34,6 +34,7 @@ import dao.DataBase;
 import dao.IDataBase;
 import lock.Lock;
 import util.IUtil;
+import util.ReleeseResources;
 import util.Util;
 
 public class Main extends JFrame {
@@ -87,28 +88,7 @@ public class Main extends JFrame {
 
 						public void windowClosing(final WindowEvent event) {
 							// TODO Auto-generated method stub
-							event.getWindow().setVisible(false);
-							final SystemTray systemTray = SystemTray.getSystemTray();
-
-							PopupMenu trayPopupMenu = new PopupMenu();
-
-							MenuItem open = new MenuItem("Открыть");
-							open.addActionListener(new ActionListener() {
-								public void actionPerformed(ActionEvent e) {
-									event.getWindow().setVisible(true);
-									systemTray.remove(trayIcon);
-								}
-							});
-							trayPopupMenu.add(open);
-							trayIcon = new TrayIcon(ICON_IMAGE, "Kontur", trayPopupMenu);
-
-							trayIcon.setImageAutoSize(true);
-
-							try {
-								systemTray.add(trayIcon);
-							} catch (AWTException awtException) {
-								awtException.printStackTrace();
-							}
+							ReleeseResources.releeseResources();
 						}
 
 					});
@@ -118,6 +98,7 @@ public class Main extends JFrame {
 			}
 		});
 	}
+	
 
 	/**
 	 * Create the frame.
