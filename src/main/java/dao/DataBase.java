@@ -47,14 +47,14 @@ public class DataBase implements IDataBase{
 		// TODO Auto-generated method stub
 		mongoClient.close();
 	}
-	
+
 	@Override
 	public Lock checkLock() throws JsonMappingException, JsonProcessingException {
 		// TODO Auto-generated method stub
 		ObjectMapper mapper = new ObjectMapper();
 		MongoCollection<Document> col = db.getCollection("lock");
 		FindIterable<Document> fi = col.find();
-		MongoCursor<Document> cursor = fi.iterator();
+		MongoCursor<Document> cursor = fi.cursor();
 		Lock lock = null;
 		while (cursor.hasNext()) {
 			lock = mapper.readValue(cursor.next().toJson(), Lock.class);
@@ -72,6 +72,7 @@ public class DataBase implements IDataBase{
 		// TODO Auto-generated method stub
 		Process process = new ProcessBuilder("mstsc.exe", "/v:10.177.112.170", "/f",
                 "/edit", path).start();
+
 	}
 
 	@Override
@@ -80,7 +81,7 @@ public class DataBase implements IDataBase{
 		MongoCollection<Document> col = db.getCollection("lock");
 		Document doc = new Document();
 		doc.put("user", getUserName());
-		doc.put("datestart", getCurrentDate());
+		doc.put("dateStart", getCurrentDate());
 		col.insertOne(doc);
 	}
 
@@ -130,5 +131,11 @@ public class DataBase implements IDataBase{
         newDoc.put("dateend", log.dateEnd);
         Bson filterUpdate = Filters.eq("_id", -1);
         db.getCollection("log").updateOne(filterUpdate, new Document("$set", newDoc));
+	}
+
+	@Override
+	public Lock checkSatus() throws JsonMappingException, JsonProcessingException {
+		// TODO Auto-generated method stub
+		return checkLock();
 	}
 }

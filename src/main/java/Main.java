@@ -54,7 +54,7 @@ public class Main extends JFrame {
 			.getImage(new File("").getAbsolutePath() + "\\ic_image.ico");
 	private static final String PATH_TO_PROPERTIES = new File("").getAbsolutePath() + "\\settings.properties";
 	private static final String PATH_TO_KONTUR = new File("").getAbsolutePath() + "\\kontur.rdp";
-	
+
 	/**
 	 * Launch the application.
 	 */
@@ -147,7 +147,7 @@ public class Main extends JFrame {
 		checkStatusBtn.setBounds(12, 125, 204, 43);
 		contentPane.add(checkStatusBtn);
 
-		statusLabel = new JLabel("dynamic");
+		statusLabel = new JLabel("");
 		statusLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		statusLabel.setFont(new Font("Times New Roman", Font.BOLD, 20));
 		statusLabel.setBounds(239, 125, 181, 43);
@@ -164,61 +164,86 @@ public class Main extends JFrame {
 		connectBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 
-				Properties prop = null;
+				connectToDatabase();
 
-				if (!isConnected) {
-					try {
-						prop = util.getProperties(PATH_TO_PROPERTIES);
-					} catch (Exception ex) {
-						JOptionPane.showMessageDialog(null, "Ошибка чтения файла настроек: " + ex.getMessage());
-					}
-
-					try {
-						isConnected = dataBase.connect(prop);
-					} catch (Exception exDb) {
-						JOptionPane.showMessageDialog(null, "Ошибка подключения к базе данных: " + exDb.getMessage());
-					}
-
-				}
-				
 				try {
-				lock= dataBase.checkLock();
-				if(lock.user.equals("none")) {
-					dataBase.lockConnection();
-					connectBtn.setEnabled(false);
-					connectLabel.setText("Активно");
-					connectLabel.setForeground(Color.green);
-					try {
-						dataBase.openKontur(PATH_TO_KONTUR);
-					} catch (IOException e1) {
-						// TODO Auto-generated catch block
-						JOptionPane.showMessageDialog(null,"Ошибка запуска контура: " + e1.getMessage());
+					lock = dataBase.checkLock();
+					if (lock.user.equals("none")) {
+						dataBase.lockConnection();
+						connectBtn.setEnabled(false);
+						connectLabel.setText("Активно");
+						connectLabel.setForeground(Color.green);
+						try {
+							dataBase.openKontur(PATH_TO_KONTUR);
+						} catch (IOException e1) {
+							// TODO Auto-generated catch block
+							JOptionPane.showMessageDialog(null, "Ошибка запуска контура: " + e1.getMessage());
+						}
+					} else {
+						JOptionPane.showMessageDialog(null,
+								"Контур сейчас занят пользователем: " + lock.user + " с " + lock.dateStart);
+						dataBase.disconnect();
+						connectBtn.setEnabled(true);
+						connectLabel.setText("Не активно");
+						connectLabel.setForeground(Color.red);
 					}
-				}else {
-					JOptionPane.showMessageDialog(null, "Контур сейчас занят пользователем: " + lock.user + " с " + lock.dateStart);
-					dataBase.disconnect();
-					connectBtn.setEnabled(true);
-					connectLabel.setText("Не активно");
-					connectLabel.setForeground(Color.red);
+				} catch (JsonProcessingException jme) {
+					JOptionPane.showMessageDialog(null, "Ошибка чтения из базы данных: " + jme.getMessage());
 				}
-				}catch (JsonProcessingException jme) {
-					JOptionPane.showMessageDialog(null,"Ошибка чтения из базы данных: " + jme.getMessage());
-		        }
-				
+
 			}
 		});
-		
+
 		disconnectBtn.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-            	
-            	dataBase.disconnect();
-            	dataBase.unlockConnections();
-            	connectBtn.setEnabled(true);
+			public void actionPerformed(ActionEvent e) {
+
+				dataBase.unlockConnections();
+				dataBase.disconnect();
+				connectBtn.setEnabled(true);
 				connectLabel.setText("Не активно");
 				connectLabel.setForeground(Color.red);
-            	
-            }
+
+			}
 		});
+
+		checkStatusBtn.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+
+				try {
+					Lock lock = dataBase.checkSatus();
+				} catch (JsonProcessingException j) {
+					JOptionPane.showMessageDialog(null, "Ошибка чтения из базы данных: " + j.getMessage());
+				}
+				connectToDatabase();
+				if (lock.user.equals("none")) {
+					statusLabel.setText("Контур свободен");
+				} else {
+					JOptionPane.showMessageDialog(null,
+							"Контур сейчас занят пользователем: " + lock.user + " с " + lock.dateStart);
+					statusLabel.setText("Контур занят");
+				}
+
+			}
+		});
+	}
+
+	private void connectToDatabase() {
+
+		Properties prop = null;
+		if (!isConnected) {
+			try {
+				prop = util.getProperties(PATH_TO_PROPERTIES);
+			} catch (Exception ex) {
+				JOptionPane.showMessageDialog(null, "Ошибка чтения файла настроек: " + ex.getMessage());
+			}
+
+			try {
+				isConnected = dataBase.connect(prop);
+			} catch (Exception exDb) {
+				JOptionPane.showMessageDialog(null, "Ошибка подключения к базе данных: " + exDb.getMessage());
+			}
+
+		}
 	}
 
 }

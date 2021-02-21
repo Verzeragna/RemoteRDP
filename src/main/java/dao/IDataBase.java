@@ -18,4 +18,5 @@ public interface IDataBase {
 	void unlockConnections();
 	void recordLog();
 	void updateLog() throws JsonMappingException, JsonProcessingException;
+	Lock checkSatus() throws JsonMappingException, JsonProcessingException;
 }
