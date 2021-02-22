@@ -1,25 +1,17 @@
-import java.awt.AWTException;
 import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.Image;
-import java.awt.MenuItem;
-import java.awt.PopupMenu;
-import java.awt.SystemTray;
 import java.awt.Toolkit;
-import java.awt.TrayIcon;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.File;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Properties;
 
 import javax.swing.JButton;
-import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -28,8 +20,6 @@ import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-
 import dao.DataBase;
 import dao.IDataBase;
 import lock.Lock;
@@ -40,7 +30,6 @@ import util.Util;
 public class Main extends JFrame {
 
 	private static final long serialVersionUID = 1L;
-	private static TrayIcon trayIcon;
 	private IDataBase dataBase = new DataBase();
 	private IUtil util = new Util();
 	private boolean isConnected = false;
@@ -191,7 +180,7 @@ public class Main extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 
 				try {
-					Lock lock = dataBase.checkSatus();
+					lock = dataBase.checkSatus();
 				} catch (JsonProcessingException j) {
 					JOptionPane.showMessageDialog(null, "Ошибка чтения из базы данных: " + j.getMessage());
 				}
